@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+            python3-pip \
+            build-essential \
+            git \
+            python3-dev \
+            ffmpeg \
+            libsdl2-dev \
+            libsdl2-image-dev \
+            libsdl2-mixer-dev \
+            libsdl2-ttf-dev \
+            libportmidi-dev \
+            libswscale-dev \
+            libavformat-dev \
+            libavcodec-dev \
+            zlib1g-dev
+
+    - name: Install Buildozer and dependencies
+      run: |
+        pip install --upgrade pip
+        pip install cython==0.29.33
+        pip install buildozer
+        pip install --upgrade git+https://github.com/kivy/buildozer.git@master
+
+    - name: Build with Buildozer
+      uses: ArtemGr/buildozer-action@v1
+      id: buildozer
+      with:
+        command: buildozer -v android debug
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@3.12.7
+      with:
+        name: package
+        path: |
+          bin/*.apk
