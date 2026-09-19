@@ -33,26 +33,22 @@ jobs:
             libswscale-dev \
             libavformat-dev \
             libavcodec-dev \
-            zlib1g-dev
+            zlib1g-dev \
+            libffi-dev \
+            libssl-dev
 
-    - name: Install Buildozer and dependencies
+    - name: Install Buildozer and Cython
       run: |
         pip install --upgrade pip
-        pip install cython==0.29.33
-        pip install buildozer
-        pip install --upgrade git+https://github.com/kivy/buildozer.git@master
+        pip install --upgrade cython==0.29.33 virtualenv
+        pip install --upgrade buildozer
 
-    - name: Build with Buildozer
-      uses: ArtemGr/buildozer-action@v1
-      id: buildozer
-      with:
-        command: buildozer -v android debug
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build APK with Buildozer
+      run: |
+        buildozer -v android debug
 
-    - name: Upload Artifact
-      uses: actions/upload-artifact@3.12.7
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v3
       with:
         name: package
-        path: |
-          bin/*.apk
+        path: bin/*.apk
