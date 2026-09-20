@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout repository
@@ -54,8 +54,13 @@ jobs:
             "buildozer==1.5.0"
 
       - name: Build APK with Buildozer
+        env:
+          ACLOCAL_PATH: /usr/share/aclocal
         run: |
           rm -rf .buildozer
+          autoreconf --version
+          libtoolize --version
+          test -f /usr/share/aclocal/libtool.m4
           yes | buildozer -v android debug
 
       - name: Upload APK artifact
